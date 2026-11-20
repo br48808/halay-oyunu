@@ -7,7 +7,7 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 
-const tiktokUsername = "sumsum1126"; 
+const tiktokUsername = "br48808"; 
 let tiktok = new WebcastPushConnection(tiktokUsername);
 
 tiktok.connect().catch(err => console.log("Yayın bekleniyor..."));
@@ -29,7 +29,26 @@ tiktok.on('gift', data => {
     });
 });
 
-// Oyun ekranı doğrudan bu kodun içinden sunulur
+// TEST LİNKİ 1: Yorum yazmış gibi sıradan oyuncu ekler
+app.get('/test-katil', (req, res) => {
+    const no = Math.floor(Math.random() * 100);
+    io.emit('halayaKatil', {
+        isim: 'Izleyici_' + no,
+        resim: 'https://dicebear.com' + no
+    });
+    res.send('Test oyuncusu halaya eklendi! TikTok LIVE Studio ekranina bakin.');
+});
+
+// TEST LİNKİ 2: Hediye atmış gibi Halay Başı ekler
+app.get('/test-hediye', (req, res) => {
+    const no = Math.floor(Math.random() * 100);
+    io.emit('halayBasiYap', {
+        isim: 'Kral_' + no,
+        resim: 'https://dicebear.com' + no
+    });
+    res.send('Test Halay Basi eklendi! TikTok LIVE Studio ekranina bakin.');
+});
+
 app.get('/', (req, res) => {
     res.send(`
     <!DOCTYPE html>
@@ -40,7 +59,7 @@ app.get('/', (req, res) => {
             body { margin: 0; overflow: hidden; background: transparent; font-family: sans-serif; }
             #alan { position: absolute; bottom: 50px; left: 50px; display: flex; gap: 15px; align-items: flex-end; }
             .kisi { text-align: center; animation: zipla 0.5s infinite alternate; }
-            .kisi img { width: 60px; height: 60px; border-radius: 50%; border: 3px solid white; }
+            .kisi img { width: 60px; height: 60px; border-radius: 50%; border: 3px solid white; background: #222; }
             .basi img { width: 85px; height: 85px; border: 4px solid gold; }
             .isim { background: rgba(0,0,0,0.7); color: white; font-size: 12px; padding: 2px 5px; border-radius: 4px; }
             @keyframes zipla { from { transform: translateY(0); } to { transform: translateY(-15px); } }
