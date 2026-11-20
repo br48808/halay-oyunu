@@ -7,7 +7,7 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 
-const tiktokUsername = "br48808"; 
+const tiktokUsername = "sumsum1126"; 
 let tiktok = new WebcastPushConnection(tiktokUsername);
 
 tiktok.connect().catch(err => console.log("Yayın bekleniyor..."));
