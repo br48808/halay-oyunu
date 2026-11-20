@@ -95,14 +95,13 @@ tiktok.on('like', data => {
     io.emit('begeniGeldi', data.likeCount || 5);
 });
 
-// TEST LİNKLERİ
 app.get('/test-katil', (req, res) => {
     const no = Math.floor(Math.random() * 90) + 10;
     const isim = 'Elif' + no;
     const sehir = sehirListesi[Math.floor(Math.random() * sehirListesi.length)];
     const avatarUrl = 'https://dicebear.com' + no;
     io.emit('halayaKatil', { isim: isim, resim: avatarUrl, sehir: sehir });
-    res.send('Test oyuncusu (' + sehir.plaka + ' ' + sehir.ad + ') halaya katıldı!');
+    res.send('Gerçekçi oyuncu (' + sehir.plaka + ' ' + sehir.ad + ') halaya katıldı!');
 });
 
 app.get('/test-hediye', (req, res) => {
@@ -151,33 +150,31 @@ app.get('/', (req, res) => {
         '@keyframes kartGiris { from { transform: translateY(-15px) scale(0.9); opacity: 0; } to { transform: translateY(0) scale(1); opacity: 1; } }',
         '.bildirim-kart img { width: 38px; height: 38px; border-radius: 50%; border: 2px solid gold; }',
         '.kart-detay { display: flex; flex-direction: column; font-size: 12px; }',
-        '.kart-ust { font-weight: 900; color: #fde047; }',
-'.kart-alt { font-size: 10px; font-weight: 800; color: #e2e8f0; margin-top: 2px; }',
-'#meydan { position: absolute; top: 64%; left: 50%; transform: translate(-50%, -50%); width: 96vw; height: 50vh; border-radius: 50%; background: radial-gradient(circle, #78553a 0%, #4a3220 55%, #291a10 90%, #140c07 100%); border: 5px solid rgba(251, 191, 36, 0.5); box-shadow: 0 0 60px rgba(245, 158, 11, 0.35), inset 0 0 50px rgba(0,0,0,0.8); }',
-'#sahne-platform { position: absolute; top: 48%; left: 50%; transform: translate(-50%, -50%); width: 175px; height: 115px; background: linear-gradient(180deg, #b45309 0%, #78350f 70%, #451a03 100%); border-radius: 16px; border: 3px solid #fde047; box-shadow: 0 20px 35px rgba(0,0,0,0.9), 0 0 25px rgba(251, 191, 36, 0.6); display: flex; flex-direction: column; align-items: center; justify-content: flex-end; padding-bottom: 6px; z-index: 60; }',
-'#osimhen-kutu { position: absolute; bottom: 18px; display: flex; flex-direction: column; align-items: center; animation: ritimDans 0.45s infinite alternate; }',
-'@keyframes ritimDans { from { transform: translateY(0) rotate(-2deg); } to { transform: translateY(-8px) rotate(2deg); } }',
-'.sahne-tabela { background: #111; color: #fde047; font-size: 9px; font-weight: 900; padding: 2px 8px; border-radius: 6px; border: 1px solid #f59e0b; }',
-'.karakter { position: absolute; display: flex; flex-direction: column; align-items: center; transform: translate(-50%, -85%); transition: left 0.15s linear, top 0.15s linear; animation: halayAdim 0.45s infinite alternate ease-in-out; }',
-'@keyframes halayAdim { 0% { transform: translate(-50%, -85%) translateY(0px) rotate(-3deg); } 100% { transform: translate(-50%, -85%) translateY(-10px) rotate(3deg); } }',
-'.etiket { background: rgba(15, 15, 15, 0.92); color: white; font-size: 10px; font-weight: 800; padding: 2px 6px; border-radius: 10px; margin-bottom: 2px; display: flex; align-items: center; gap: 3px; border: 1px solid rgba(255,255,255,0.2); white-space: nowrap; }',
-'.etiket-plaka { background: #dc2626; color: #fef08a; font-size: 8px; padding: 0px 4px; border-radius: 4px; }',
-'.kafa { width: 34px; height: 34px; border-radius: 50%; border: 2px solid white; object-fit: cover; z-index: 3; background: #222; }',
-'.govde { width: 26px; height: 30px; border-radius: 8px 8px 3px 3px; margin-top: -3px; position: relative; box-shadow: inset -3px -3px 6px rgba(0,0,0,0.5); z-index: 2; border-top: 3px solid #fde047; }',
-'.kol-sol, .kol-sag { position: absolute; top: 4px; width: 16px; height: 5px; border-radius: 3px; background: inherit; }',
-'.kol-sol { left: -13px; transform: rotate(-20deg); }',
-'.kol-sag { right: -13px; transform: rotate(20deg); }',
-'.bacaklar { display: flex; gap: 4px; margin-top: -1px; }',
-'.bacak { width: 7px; height: 14px; background: #111; border-radius: 0 0 3px 3px; }',
-'.halay-basi .kafa { width: 44px; height: 44px; border: 3px solid #fbbf24; box-shadow: 0 0 15px #fbbf24; }',
-'.mendil { position: absolute; right: -26px; top: -12px; font-size: 22px; animation: mendilSalla 0.3s infinite alternate; }',
-'@keyframes mendilSalla { from { transform: rotate(-20deg); } to { transform: rotate(25deg); } }',
-'.havai-fisek { position: absolute; font-size: 42px; animation: patla 1.2s ease-out forwards; pointer-events: none; z-index: 400; }',
-'@keyframes patla { 0% { transform: scale(0.2); opacity: 1; } 100% { transform: scale(2.2); opacity: 0; } }',
-'',
-'',
-'',
-'',
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 '',
 '',
 '  2️⃣ Hediye at, düğün şenlensin 🌹',
@@ -198,6 +195,32 @@ app.get('/', (req, res) => {
 '  ',
 '    ',
 '      ',
+'        ',
+'          ',
+'          ',
+'          ',
+'        ',
+'        ',
+'        ',
+'        ',
+'        ',
+'        ',
+'        ',
+'        ',
+'        ',
+'        ',
+'        ',
+'        ',
+'        ',
+'        ',
+'        ',
+'        ',
+'        ',
+'        ',
+'        ',
+'        ',
+'        ',
+'        ',
 '        ',
 '        ',
 '        ',
@@ -222,7 +245,7 @@ app.get('/', (req, res) => {
 'const sehirDiv = document.getElementById("sehir-skorlar");',
 'const farkDiv = document.getElementById("fark-bilgi");',
 'const bildirimDiv = document.getElementById("bildirim-alani");',
-'const renkler = ["#dc2626", "#2563eb", "#16a34a", "#9333ea", "#ea580c", "#e11d48"];',
+'const yelekRenkleri = ["#991b1b", "#1e40af", "#166534", "#6b21a8", "#9a3412", "#831843"];',
 'let oyuncular = [];',
 'let donusAcisi = 0;',
 'let davulPuan = 600;',
@@ -263,6 +286,26 @@ app.get('/', (req, res) => {
 '  if (bildirimDiv.children.length > 2) bildirimDiv.lastChild.remove();',
 '  setTimeout(() => { if (kart) kart.remove(); }, 4500);',
 '}',
+'function insanGovdesiOlustur(renk, basiMi) {',
+'  const yelek = basiMi ? "#d97706" : renk;',
+'  const mendilSvg = basiMi ? "<path class=\"mendil-salla\" d=\"M50 18 Q58 4 46 0 Q42 10 50 18\" fill=\"#ef4444\" stroke=\"#fde047\" stroke-width=\"0.8\"/>" : "";',
+'  return "<svg class=\"insan-beden-svg\" width=\"56\" height=\"66\" viewBox=\"0 0 60 70\">" +',
+'         "<ellipse cx=\"30\" cy=\"66\" rx=\"16\" ry=\"3.5\" fill=\"rgba(0,0,0,0.5)\"/>" +',
+'         "<path d=\"M21 40 L19 60 L27 60 L28 40 Z\" fill=\"#1e293b\"/>" +',
+'         "<path d=\"M32 40 L33 60 L41 60 L39 40 Z\" fill=\"#1e293b\"/>" +',
+'         "<ellipse cx=\"22\" cy=\"62\" rx=\"5\" ry=\"2.5\" fill=\"#09090b\"/>" +',
+'         "<ellipse cx=\"38\" cy=\"62\" rx=\"5\" ry=\"2.5\" fill=\"#09090b\"/>" +',
+'         "<path d=\"M16 14 Q6 20 3 12\" stroke=\"#f8fafc\" stroke-width=\"5\" stroke-linecap=\"round\" fill=\"none\"/>" +',
+'         "<path d=\"M44 14 Q54 20 57 12\" stroke=\"#f8fafc\" stroke-width=\"5\" stroke-linecap=\"round\" fill=\"none\"/>" +',
+'         "<circle cx=\"3\" cy=\"12\" r=\"2.5\" fill=\"#eab696\"/>" +',
+'         "<circle cx=\"57\" cy=\"12\" r=\"2.5\" fill=\"#eab696\"/>" +',
+'         "<path d=\"M16 10 L44 10 L41 38 L19 38 Z\" fill=\"#f8fafc\"/>" +',
+'         "<path d=\"M16 10 L27 10 L26 38 L18 38 Z\" fill=\"" + yelek + "\"/>" +',
+'         "<path d=\"M33 10 L44 10 L42 38 L34 38 Z\" fill=\"" + yelek + "\"/>" +',
+'         "<rect x=\"18\" y=\"35\" width=\"24\" height=\"5\" rx=\"1.5\" fill=\"#fde047\"/>" +',
+'         mendilSvg +',
+'         "";',
+'}',
 'function halkayiGuncelle() {',
 '  donusAcisi += 0.006;',
 '  const merkezX = meydan.offsetWidth / 2;',
@@ -288,7 +331,7 @@ app.get('/', (req, res) => {
 '  skorlar[sehir.plaka].puan += basiMi ? (data.jeton || 25) : 5;',
 '  tabloGuncelle();',
 '  let mevcut = oyuncular.find(o => o.isim === data.isim);',
-'  const kiyafetRengi = basiMi ? "#f59e0b" : renkler[Math.floor(Math.random() * renkler.length)];',
+'  const kiyafetRengi = yelekRenkleri[Math.floor(Math.random() * yelekRenkleri.length)];',
 '  if (mevcut) {',
 '    if (basiMi) {',
 '      oyuncular = oyuncular.filter(o => o.isim !== data.isim);',
@@ -308,11 +351,9 @@ app.get('/', (req, res) => {
 '  const div = document.createElement("div");',
 '  div.id = "oyuncu-" + data.isim;',
 '  div.className = basiMi ? "karakter halay-basi" : "karakter";',
-'  const mendil = basiMi ? "<span class=\"mendil\">🧣" : "";',
 '  div.innerHTML = "<div class=\"etiket\"><span class=\"etiket-plaka\">" + sehir.plaka + "" + data.isim + "" +',
-'                  "<img class=\"kafa\" src=\"" + data.resim + "\">" +',
-'                  "<div class=\"govde\" style=\"background:" + kiyafetRengi + "\"><div class=\"kol-sol\"><div class=\"kol-sag\">" + mendil + "" +',
-'                  "<div class=\"bacaklar\"><div class=\"bacak\"><div class=\"bacak\">";',
+'                  "<img class=\"insan-kafa\" src=\"" + data.resim + "\">" +',
+'                  insanGovdesiOlustur(kiyafetRengi, basiMi);',
 '  meydan.appendChild(div);',
 '  if (basiMi) {',
 '    bildirimGoster("hediye", data.isim, data.resim, (data.hediyeAdi || "Rose") + " x" + (data.adet || 1) + " (+" + (data.jeton || 25) + " " + sehir.plaka + " " + sehir.ad + ")");',
