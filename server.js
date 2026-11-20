@@ -225,9 +225,9 @@ function oyuncuEkle(data, basiMi) {
   kafa.className = 'insan-kafa';
   kafa.src = data.resim;
 
-  const govde = docume
-  nt.createElement('div');
+  const govde = document.createElement('div');
   govde.className = 'govde';
+  
   govde.style.background = renk;
   const kolSol = document.createElement('div');
   kolSol.className = 'kol-sol';
@@ -278,7 +278,8 @@ document.getElementById('davul-bar').style.width = Math.min(100, (davulPuan / 30
 `);
 });
 app.get('/', (req, res) => {
-res.send(`
+res.set('Content-Type', 'text/html');
+res.send(Buffer.from(`
 
 
 
@@ -373,6 +374,6 @@ Plakanı yaz halaya katıl, şehrini zirveye taşı!
 
 
 
-`);
+`));
 });
 server.listen(process.env.PORT || 3000);
