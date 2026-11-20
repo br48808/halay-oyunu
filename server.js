@@ -13,7 +13,7 @@ let tiktok = new WebcastPushConnection(tiktokUsername);
 tiktok.connect().catch(err => console.log("Yayın bekleniyor..."));
 
 const sehirListesi = [
-    { plaka: "01", ad: "Adana" }, { plaka: "02", ad: "Adıyaman" }, { plaka: "03", ad: "Afyonkarahisar" },
+    { plaka: "01", ad: "Adana" }, { plaka: "02", ad: "Adıyaman" }, { plaka: "03", ad: "Afyon" },
     { plaka: "04", ad: "Ağrı" }, { plaka: "05", ad: "Amasya" }, { plaka: "06", ad: "Ankara" },
     { plaka: "07", ad: "Antalya" }, { plaka: "08", ad: "Artvin" }, { plaka: "09", ad: "Aydın" },
     { plaka: "10", ad: "Balıkesir" }, { plaka: "11", ad: "Bilecik" }, { plaka: "12", ad: "Bingöl" },
@@ -28,7 +28,7 @@ const sehirListesi = [
     { plaka: "37", ad: "Kastamonu" }, { plaka: "38", ad: "Kayseri" }, { plaka: "39", ad: "Kırklareli" },
     { plaka: "40", ad: "Kırşehir" }, { plaka: "41", ad: "Kocaeli" }, { plaka: "42", ad: "Konya" },
     { plaka: "43", ad: "Kütahya" }, { plaka: "44", ad: "Malatya" }, { plaka: "45", ad: "Manisa" },
-    { plaka: "46", ad: "Kahramanmaraş" }, { plaka: "47", ad: "Mardin" }, { plaka: "48", ad: "Muğla" },
+    { plaka: "46", ad: "K.Maraş" }, { plaka: "47", ad: "Mardin" }, { plaka: "48", ad: "Muğla" },
     { plaka: "49", ad: "Muş" }, { plaka: "50", ad: "Nevşehir" }, { plaka: "51", ad: "Niğde" },
     { plaka: "52", ad: "Ordu" }, { plaka: "53", ad: "Rize" }, { plaka: "54", ad: "Sakarya" },
     { plaka: "55", ad: "Samsun" }, { plaka: "56", ad: "Siirt" }, { plaka: "57", ad: "Sinop" },
@@ -45,15 +45,7 @@ const sehirListesi = [
 function sehirBul(metin) {
     const kucuk = metin.toLowerCase();
     for (let s of sehirListesi) {
-        if (kucuk.includes(s.ad.toLowerCase())) return s;
-    }
-    const sayilar = metin.match(/\b\d{1,2}\b/g);
-    if (sayilar) {
-        for (let num of sayilar) {
-            const p = num.padStart(2, '0');
-            const bulunan = sehirListesi.find(s => s.plaka === p);
-            if (bulunan) return bulunan;
-        }
+        if (kucuk.includes(s.ad.toLowerCase()) || kucuk.includes(s.plaka)) return s;
     }
     return sehirListesi[Math.floor(Math.random() * sehirListesi.length)];
 }
@@ -62,7 +54,7 @@ tiktok.on('chat', data => {
     const mesaj = data.comment;
     const sehir = sehirBul(mesaj);
     io.emit('yorumGeldi', { isim: data.uniqueId, resim: data.profilePictureUrl, mesaj: mesaj, sehir: sehir });
-    if (mesaj.toLowerCase().includes('halay') || mesaj.toLowerCase().includes('katıl') || /\b\d{1,2}\b/.test(mesaj)) {
+    if (mesaj.toLowerCase().includes('halay') || mesaj.toLowerCase().includes('katıl') || sehirListesi.some(s => mesaj.includes(s.plaka))) {
         io.emit('halayaKatil', { isim: data.uniqueId, resim: data.profilePictureUrl, sehir: sehir });
     }
 });
@@ -110,8 +102,7 @@ app.get('/test-hediye', (req, res) => {
     res.send('Test hediyesi (' + sehir.plaka + ' ' + sehir.ad + ' +25 puan) gönderildi!');
 });
 
-app.get('/', (req, res) => {
-    res.send(`<!DOCTYPE html>
+const sayfaHTML = `<!DOCTYPE html>
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
@@ -235,8 +226,8 @@ function tabloGuncelle() {
 const sirali = Object.values(skorlar).sort((a, b) => b.puan - a.puan).slice(0, 3);
 sehirDiv.innerHTML = sirali.map(s => '' + s.plaka + '' + s.ad + '' + s.puan.toLocaleString("tr-TR") + '').join("");
 if (sirali.length >= 2) {
-const fark = (sirali[0].puan - sirali[1].puan) + 1;
-farkDiv.innerText = "🔥 " + sirali[1].ad + ", 1. olmaya " + fark.toLocaleString("tr-TR") + " puan uzakta!";
+const fark = (sirali.puan - sirali.puan) + 1;
+farkDiv.innerText = "🔥 " + sirali.ad + ", 1. olmaya " + fark.toLocaleString("tr-TR") + " puan uzakta!";
 }
 }
 tabloGuncelle();
@@ -351,6 +342,8 @@ document.getElementById("davul-bar").style.width = Math.min(100, (davulPuan / 30
 });
 
 
-`);
+`;
+app.get('/', (req, res) => {
+res.send(sayfaHTML);
 });
 server.listen(process.env.PORT || 3000);
