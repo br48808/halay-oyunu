@@ -96,13 +96,193 @@ app.get('/test-hediye', (req, res) => {
     res.send('Hediye (' + sehir.plaka + ' ' + sehir.ad + ' +25 puan) gönderildi!');
 });
 
+app.get('/oyun.js', (req, res) => {
+    res.type('application/javascript');
+    res.send(`
+const socket = io();
+const meydan = document.getElementById('meydan');
+const sehirDiv = document.getElementById('sehir-skorlar');
+const farkDiv = document.getElementById('fark-bilgi');
+const bildirimDiv = document.getElementById('bildirim-alani');
+const renkler = ['#991b1b', '#1e40af', '#166534', '#6b21a8', '#9a3412', '#831843'];
+let oyuncular = [];
+let donusAcisi = 0;
+let davulPuan = 600;
+let fisekPuan = 150;
+let skorlar = {
+  '34': { plaka: '34', ad: 'İstanbul', puan: 150 },
+  '48': { plaka: '48', ad: 'Muğla', puan: 120 },
+  '06': { plaka: '06', ad: 'Ankara', puan: 90 }
+};
+
+function tabloGuncelle() {
+  const sirali = Object.values(skorlar).sort((a, b) => b.puan - a.puan).slice(0, 3);
+  sehirDiv.innerHTML = '';
+  sirali.forEach(s => {
+    const kart = document.createElement('div');
+    kart.className = 'sehir-kart';
+    kart.innerHTML = '<div><span class="plaka">' + s.plaka + '</span>' + s.ad + '</div><div class="sehir-puan">' + s.puan + '</div>';
+    sehirDiv.appendChild(kart);
+  });
+  if (sirali.length >= 2) {
+    const fark = (sirali[0].puan - sirali[1].puan) + 1;
+    farkDiv.innerText = '🔥 ' + sirali[1].ad + ', 1. olmaya ' + fark + ' puan uzakta!';
+  }
+}
+tabloGuncelle();
+
+function havaiFisekPatlat() {
+  for (let i = 0; i < 6; i++) {
+    setTimeout(() => {
+      const f = document.createElement('div');
+      f.className = 'havai-fisek';
+      f.innerText = '🎆';
+      f.style.left = (15 + Math.random() * 70) + 'vw';
+      f.style.top = (15 + Math.random() * 40) + 'vh';
+      document.body.appendChild(f);
+      setTimeout(() => f.remove(), 1200);
+    }, i * 250);
+  }
+}
+
+function bildirimGoster(tip, isim, resim, altYazi) {
+  const kart = document.createElement('div');
+  kart.className = tip === 'katilim' ? 'bildirim-kart katilim' : 'bildirim-kart';
+  const img = document.createElement('img');
+  img.src = resim;
+  const bilgi = document.createElement('div');
+  const ust = document.createElement('div');
+  ust.style.cssText = 'font-weight:900;color:#fde047;font-size:12px;';
+  ust.innerText = tip === 'katilim' ? '✅ HALAYA KATILDI • ' + isim : '🎁 ' + isim + ' → ' + altYazi;
+  const alt = document.createElement('div');
+  alt.style.cssText = 'font-size:10px;color:#eee;';
+  alt.innerText = '81 İl Memleket Düğünü';
+  bilgi.appendChild(ust);
+  bilgi.appendChild(alt);
+  kart.appendChild(img);
+  kart.appendChild(bilgi);
+  bildirimDiv.prepend(kart);
+  if (bildirimDiv.children.length > 2) bildirimDiv.lastChild.remove();
+  setTimeout(() => { if (kart) kart.remove(); }, 4500);
+}
+
+function halkayiGuncelle() {
+  donusAcisi += 0.006;
+  const merkezX = meydan.offsetWidth / 2;
+  const merkezY = meydan.offsetHeight / 2;
+  const yaricapX = merkezX * 0.84;
+  const yaricapY = merkezY * 0.78;
+  oyuncular.forEach((oyuncu, index) => {
+    const el = document.getElementById('oyuncu-' + oyuncu.isim);
+    if (!el) return;
+    const aci = donusAcisi + (index * (2 * Math.PI / oyuncular.length));
+    const x = merkezX + yaricapX * Math.cos(aci);
+    const y = merkezY + yaricapY * Math.sin(aci);
+    el.style.left = x + 'px';
+    el.style.top = y + 'px';
+    el.style.zIndex = Math.floor(y);
+  });
+  requestAnimationFrame(halkayiGuncelle);
+}
+requestAnimationFrame(halkayiGuncelle);
+
+function oyuncuEkle(data, basiMi) {
+  const sehir = data.sehir || { plaka: '34', ad: 'İstanbul' };
+  if (!skorlar[sehir.plaka]) skorlar[sehir.plaka] = { plaka: sehir.plaka, ad: sehir.ad, puan: 0 };
+  skorlar[sehir.plaka].puan += basiMi ? (data.jeton || 25) : 5;
+  tabloGuncelle();
+  let mevcut = oyuncular.find(o => o.isim === data.isim);
+  const renk = basiMi ? '#d97706' : renkler[Math.floor(Math.random() * renkler.length)];
+  if (mevcut) {
+    if (basiMi) {
+      oyuncular = oyuncular.filter(o => o.isim !== data.isim);
+      oyuncular.unshift({ isim: data.isim, resim: data.resim, basiMi: true });
+      const eskiEl = document.getElementById('oyuncu-' + data.isim);
+      if (eskiEl) eskiEl.remove();
+    } else { return; }
+  } else {
+    if (basiMi) { oyuncular.unshift({ isim: data.isim, resim: data.resim, basiMi: true }); }
+    else { oyuncular.push({ isim: data.isim, resim: data.resim, basiMi: false }); }
+  }
+  if (oyuncular.length > 26) {
+    const cikan = oyuncular.pop();
+    const cikanEl = document.getElementById('oyuncu-' + cikan.isim);
+    if (cikanEl) cikanEl.remove();
+  }
+  const div = document.createElement('div');
+  div.id = 'oyuncu-' + data.isim;
+  div.className = basiMi ? 'karakter halay-basi' : 'karakter';
+
+  const etiket = document.createElement('div');
+  etiket.className = 'etiket';
+  const plakaSpan = document.createElement('span');
+  plakaSpan.className = 'etiket-plaka';
+  plakaSpan.innerText = sehir.plaka;
+  etiket.appendChild(plakaSpan);
+  etiket.appendChild(document.createTextNode(data.isim));
+
+  const kafa = document.createElement('img');
+  kafa.className = 'insan-kafa';
+  kafa.src = data.resim;
+
+  const govde = docume
+  nt.createElement('div');
+  govde.className = 'govde';
+  govde.style.background = renk;
+  const kolSol = document.createElement('div');
+  kolSol.className = 'kol-sol';
+  const kolSag = document.createElement('div');
+  kolSag.className = 'kol-sag';
+  govde.appendChild(kolSol);
+  govde.appendChild(kolSag);
+  if (basiMi) {
+    const mendil = document.createElement('span');
+    mendil.className = 'mendil';
+    mendil.innerText = '🧣';
+    govde.appendChild(mendil);
+  }
+
+  const bacaklar = document.createElement('div');
+  bacaklar.className = 'bacaklar';
+  const b1 = document.createElement('div');
+  b1.className = 'bacak';
+  const b2 = document.createElement('div');
+  b2.className = 'bacak';
+  bacaklar.appendChild(b1);
+  bacaklar.appendChild(b2);
+
+  div.appendChild(etiket);
+  div.appendChild(kafa);
+  div.appendChild(govde);
+  div.appendChild(bacaklar);
+  meydan.appendChild(div);
+
+  if (basiMi) {
+  bildirimGoster('hediye', data.isim, data.resim, (data.hediyeAdi || 'Rose') + ' x' + (data.adet || 1) + ' (+' + (data.jeton || 25) + ' ' + sehir.plaka + ' ' + sehir.ad + ')');
+fisekPuan += (data.jeton || 25);
+if (fisekPuan >= 500) { fisekPuan = 0; havaiFisekPatlat(); }
+document.getElementById('fisek-sayi').innerText = fisekPuan;
+document.getElementById('fisek-bar').style.width = Math.min(100, (fisekPuan / 500) * 100) + '%';
+} else {
+bildirimGoster('katilim', data.isim, data.resim, sehir.plaka + ' ' + sehir.ad);
+}
+}
+socket.on('halayaKatil', d => oyuncuEkle(d, false));
+socket.on('halayBasiYap', d => oyuncuEkle(d, true));
+socket.on('begeniGeldi', s => {
+davulPuan += s;
+if (davulPuan >= 3000) { davulPuan = 0; havaiFisekPatlat(); }
+document.getElementById('davul-sayi').innerText = davulPuan;
+document.getElementById('davul-bar').style.width = Math.min(100, (davulPuan / 3000) * 100) + '%';
+});
+`);
+});
 app.get('/', (req, res) => {
-    res.send(`<!DOCTYPE html>
-<html lang="tr">
-<head>
-<meta charset="UTF-8">
-<style>
-* { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, sans-serif; }
+res.send(`
+
+
+
+• { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, sans-serif; }
 body { width: 100vw; height: 100vh; overflow: hidden; background: radial-gradient(circle at 50% 45%, #4a2c18 0%, #1c110a 60%, #090503 100%); position: relative; color: white; }
 .ust-banner { position: absolute; top: 18px; left: 50%; transform: translateX(-50%); width: 92vw; background: #14100d; border: 2px solid #eab308; border-radius: 14px; padding: 10px; text-align: center; box-shadow: 0 6px 20px rgba(0,0,0,0.8); z-index: 300; }
 .ust-banner h1 { font-size: 18px; font-weight: 900; color: #fde047; }
@@ -140,22 +320,22 @@ body { width: 100vw; height: 100vh; overflow: hidden; background: radial-gradien
 .mendil { position: absolute; right: -26px; top: -14px; font-size: 22px; }
 .havai-fisek { position: absolute; font-size: 42px; animation: patla 1.2s forwards; z-index: 400; }
 @keyframes patla { from { transform: scale(0.2); opacity: 1; } to { transform: scale(2); opacity: 0; } }
-</style>
-</head>
-<body>
-<div class="ust-banner">
-  <h1>2️⃣ Hediye at, düğün şenlensin 🌹</h1>
-  <p>Plakanı yaz halaya katıl, şehrini zirveye taşı!</p>
-</div>
-<div class="lig-baslik">
-  <span>✨ 81 İL MEMLEKET DÜĞÜNÜ</span>
-  <span>⏳ TUR 1 • CANLI</span>
-</div>
-<div id="sehir-skorlar"></div>
-<div id="fark-bilgi" class="fark-bilgi">🔥 Plakanı yaz (Örn: 34, 48, 01) halaya katıl!</div>
-<div class="barlar">
-  <div class="bar-kutu">❤️ <span id="davul-sayi">600</span>/3.000 → 🥁 DAVUL ŞOVU<div class="bar-doluluk" id="davul-bar" style="width:20%; background:#ef4444;"></div></div>
-  💎 150/500 → 🎆 HAVAİ FİŞEK
+
+
+
+
+2️⃣ Hediye at, düğün şenlensin 🌹
+Plakanı yaz halaya katıl, şehrini zirveye taşı!
+
+
+✨ 81 İL MEMLEKET DÜĞÜNÜ
+⏳ TUR 1 • CANLI
+
+
+🔥 Plakanı yaz (Örn: 34, 48, 01) halaya katıl!
+
+❤️ 600/3.000 → 🥁 DAVUL ŞOVU
+💎 150/500 → 🎆 HAVAİ FİŞEK
 
 
 
@@ -191,124 +371,6 @@ body { width: 100vw; height: 100vh; overflow: hidden; background: radial-gradien
 
 
 
-
-const socket = io();
-const meydan = document.getElementById('meydan');
-const sehirDiv = document.getElementById('sehir-skorlar');
-const farkDiv = document.getElementById('fark-bilgi');
-const bildirimDiv = document.getElementById('bildirim-alani');
-const renkler = ['#991b1b', '#1e40af', '#166534', '#6b21a8', '#9a3412', '#831843'];
-let oyuncular = [];
-let donusAcisi = 0;
-let davulPuan = 600;
-let fisekPuan = 150;
-let skorlar = {
-'34': { plaka: '34', ad: 'İstanbul', puan: 150 },
-'48': { plaka: '48', ad: 'Muğla', puan: 120 },
-'06': { plaka: '06', ad: 'Ankara', puan: 90 }
-};
-function tabloGuncelle() {
-const sirali = Object.values(skorlar).sort((a, b) => b.puan - a.puan).slice(0, 3);
-sehirDiv.innerHTML = sirali.map(s => '' + s.plaka + '' + s.ad + '' + s.puan + '').join('');
-const birinci = sirali.at(0);
-const ikinci = sirali.at(1);
-if (birinci && ikinci) {
-const fark = (birinci.puan - ikinci.puan) + 1;
-farkDiv.innerText = '🔥 ' + ikinci.ad + ', 1. olmaya ' + fark + ' puan uzakta!';
-}
-}
-tabloGuncelle();
-function havaiFisekPatlat() {
-for (let i = 0; i < 6; i++) {
-setTimeout(() => {
-const f = document.createElement('div');
-f.className = 'havai-fisek';
-f.innerText = '🎆';
-f.style.left = (15 + Math.random() * 70) + 'vw';
-f.style.top = (15 + Math.random() * 40) + 'vh';
-document.body.appendChild(f);
-setTimeout(() => f.remove(), 1200);
-}, i * 250);
-}
-}
-function bildirimGoster(tip, isim, resim, altYazi) {
-const kart = document.createElement('div');
-kart.className = tip === 'katilim' ? 'bildirim-kart katilim' : 'bildirim-kart';
-const baslik = tip === 'katilim' ? '✅ HALAYA KATILDI • ' + isim : '🎁 ' + isim + ' → ' + altYazi;
-kart.innerHTML = '' + baslik + '81 İl Memleket Düğünü';
-bildirimDiv.prepend(kart);
-if (bildirimDiv.children.length > 2) bildirimDiv.lastChild.remove();
-setTimeout(() => { if (kart) kart.remove(); }, 4500);
-}
-function halkayiGuncelle() {
-donusAcisi += 0.006;
-const merkezX = meydan.offsetWidth / 2;
-const merkezY = meydan.offsetHeight / 2;
-const yaricapX = merkezX * 0.84;
-const yaricapY = merkezY * 0.78;
-oyuncular.forEach((oyuncu, index) => {
-const el = document.getElementById('oyuncu-' + oyuncu.isim);
-if (!el) return;
-const aci = donusAcisi + (index * (2 * Math.PI / oyuncular.length));
-const x = merkezX + yaricapX * Math.cos(aci);
-const y = merkezY + yaricapY * Math.sin(aci);
-el.style.left = x + 'px';
-el.style.top = y + 'px';
-el.style.zIndex = Math.floor(y);
-});
-requestAnimationFrame(halkayiGuncelle);
-}
-requestAnimationFrame(halkayiGuncelle);
-function oyuncuEkle(data, basiMi) {
-const sehir = data.sehir || { plaka: '34', ad: 'İstanbul' };
-if (!skorlar[sehir.plaka]) skorlar[sehir.plaka] = { plaka: sehir.plaka, ad: sehir.ad, puan: 0 };
-skorlar[sehir.plaka].puan += basiMi ? (data.jeton || 25) : 5;
-tabloGuncelle();
-let mevcut = oyuncular.find(o => o.isim === data.isim);
-const renk = basiMi ? '#d97706' : renkler[Math.floor(Math.random() * renkler.length)];
-if (mevcut) {
-if (basiMi) {
-oyuncular = oyuncular.filter(o => o.isim !== data.isim);
-oyuncular.unshift({ isim: data.isim, resim: data.resim, basiMi: true });
-const eskiEl = document.getElementById('oyuncu-' + data.isim);
-if (eskiEl) eskiEl.remove();
-} else { return; }
-} else {
-if (basiMi) { oyuncular.unshift({ isim: data.isim, resim: data.resim, basiMi: true }); }
-else { oyuncular.push({ isim: data.isim, resim: data.resim, basiMi: false }); }
-}
-if (oyuncular.length > 26) {
-const cikan = oyuncular.pop();
-const cikanEl = document.getElementById('oyuncu-' + cikan.isim);
-if (cikanEl) cikanEl.remove();
-}
-const div = document.createElement('div');
-div.id = 'oyuncu-' + data.isim;
-div.className = basiMi ? 'karakter halay-basi' : 'karakter';
-const mendil = basiMi ? '🧣' : '';
-div.innerHTML = '' + sehir.plaka + '' + data.isim + '' +
-'' +
-'' + mendil + '' +
-'';
-meydan.appendChild(div);
-if (basiMi) {
-bildirimGoster('hediye', data.isim, data.resim, (data.hediyeAdi || 'Rose') + ' x' + (data.adet || 1) + ' (+' + (data.jeton || 25) + ' ' + sehir.plaka + ' ' + sehir.ad + ')');
-fisekPuan += (data.jeton || 25);
-if (fisekPuan >= 500) { fisekPuan = 0; havaiFisekPatlat(); }
-document.getElementById('fisek-sayi').innerText = fisekPuan;
-document.getElementById('fisek-bar').style.width = Math.min(100, (fisekPuan / 500) * 100) + '%';
-} else {
-bildirimGoster('katilim', data.isim, data.resim, sehir.plaka + ' ' + sehir.ad);
-}
-}
-socket.on('halayaKatil', d => oyuncuEkle(d, false));
-socket.on('halayBasiYap', d => oyuncuEkle(d, true));
-socket.on('begeniGeldi', s => {
-davulPuan += s;
-if (davulPuan >= 3000) { davulPuan = 0; havaiFisekPatlat(); }
-document.getElementById('davul-sayi').innerText = davulPuan;
-document.getElementById('davul-bar').style.width = Math.min(100, (davulPuan / 3000) * 100) + '%';
-});
 
 
 `);
